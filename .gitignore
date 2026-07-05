@@ -1,0 +1,37 @@
+# =========================
+# Python
+# =========================
+backend/.venv/
+backend/venv/
+**/__pycache__/
+*.py[cod]
+
+# =========================
+# Runtime generated folders
+# =========================
+backend/deployments/
+backend/logs/
+backend/temp/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+backend/.env
+
+# =========================
+# Frontend
+# =========================
+frontend/node_modules/
+dist/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
