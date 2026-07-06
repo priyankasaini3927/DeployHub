@@ -3,7 +3,7 @@ from services.git_service import clone_repository
 
 deploy_bp = Blueprint("deploy", __name__)
 
-@deploy_bp.route("/deploy", methods=["POST"])
+@deploy_bp.route("/clone", methods=["POST"])
 def deploy():
 
     data = request.get_json()
