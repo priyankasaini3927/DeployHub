@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import time
+from services.process_manager import RUNNING_PROJECTS
+import os
 
 RUN_COMMANDS = {
     "Flask": [sys.executable, "app.py"],
@@ -29,6 +31,15 @@ def run_project(project_path, project_type):
         time.sleep(5)
 
         if process.poll() is None:
+            
+            project_name = os.path.basename(project_path)
+
+            RUNNING_PROJECTS[project_name] = {
+            "pid": process.pid,
+            "status": "Running",
+            "port": 5002
+            }
+            
             return {
                 "success": True,
                 "pid": process.pid,

@@ -1,4 +1,5 @@
 import subprocess
+from services.process_manager import RUNNING_PROJECTS
 
 def stop_project(pid):
 
@@ -9,6 +10,12 @@ def stop_project(pid):
             capture_output=True,
             text=True
         )
+        
+        for project in list(RUNNING_PROJECTS.keys()):
+
+            if RUNNING_PROJECTS[project]["pid"] == pid:
+                del RUNNING_PROJECTS[project]
+                break
 
         return {
             "success": True,
