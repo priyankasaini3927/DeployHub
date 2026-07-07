@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import time
+
+from click import command
 from services.process_manager import RUNNING_PROJECTS
 import os
 
@@ -21,10 +23,19 @@ def run_project(project_path, project_type):
     command = RUN_COMMANDS[project_type]
 
     try:
+        project_name = os.path.basename(project_path)
+
+        os.makedirs("logs", exist_ok=True)
+
+        stdout_log = open(f"logs/{project_name}.out", "w")
+        stderr_log = open(f"logs/{project_name}.err", "w")
+
         process = subprocess.Popen(
-        command,
-        cwd=project_path,
-        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+            command,
+            cwd=project_path,
+            stdout=stdout_log,
+            stderr=stderr_log,
+            text=True
         )
 
         # Wait longer

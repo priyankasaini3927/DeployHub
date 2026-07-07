@@ -6,6 +6,7 @@ import os
 from routes.stop import stop_bp
 from routes.status import status_bp
 from routes.history import history_bp
+from routes.logs import logs_bp
 
 app = Flask(__name__)
 
@@ -15,6 +16,7 @@ app.register_blueprint(stop_bp)
 app.register_blueprint(build_bp)
 app.register_blueprint(status_bp)
 app.register_blueprint(history_bp)
+app.register_blueprint(logs_bp)
 
 @app.route("/health")
 def health():
