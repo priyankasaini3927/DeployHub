@@ -4,6 +4,8 @@ from services.git_service import clone_repository
 from services.detector_service import detect_project
 from services.build_service import build_project
 from services.run_service import run_project
+from services.history_service import save_history
+import os
 
 deploy_bp = Blueprint("deploy", __name__)
 
@@ -54,6 +56,20 @@ def deploy():
     #step 4 - Run
     run_result = run_project(build_path, project_type)
 
+    project_name = os.path.basename(project_path)
+    
+    raise Exception("Reached here")
+    
+    print("About to save history...")
+
+    save_history(
+        project_name,
+        project_type,
+        "Success" if run_result["success"] else "Failed"
+    )
+    
+    print("History function completed.")
+    
     return jsonify({
         "success": build_result["success"] and run_result["success"],
         "repository_path": project_path,
