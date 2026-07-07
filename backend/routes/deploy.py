@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from services.git_service import clone_repository
 from services.detector_service import detect_project
 from services.build_service import build_project
+from services.run_service import run_project
 
 deploy_bp = Blueprint("deploy", __name__)
 
@@ -39,10 +40,25 @@ def deploy():
     # STEP 3 - Build
     build_path = detect_result["project_path"]
     build_result = build_project(build_path, project_type)
-
-    return jsonify({
-        "success": build_result["success"],
+    
+    if not build_result["success"]:
+        return jsonify({
+        "success": False,
         "repository_path": project_path,
         "project_type": project_type,
         "build": build_result
+        }), 500
+
+
+    
+    #step 4 - Run
+    run_result = run_project(build_path, project_type)
+
+    return jsonify({
+        "success": build_result["success"] and run_result["success"],
+        "repository_path": project_path,
+        "project_type": project_type,
+        "build": build_result,
+        "run": run_result
+
     })

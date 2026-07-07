@@ -2,6 +2,7 @@ from flask import Flask  # type: ignore[import]
 from routes.deploy import deploy_bp
 from routes.detect import detect_bp
 from routes.build import build_bp
+import os
 
 app = Flask(__name__)
 
@@ -17,4 +18,12 @@ def health():
     }
 
 if __name__ == "__main__":
-    app.run(debug=True)
+
+    port = int(os.environ.get("PORT", 5001))
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        use_reloader=False
+    )
