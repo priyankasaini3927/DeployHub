@@ -5,6 +5,7 @@ from services.detector_service import detect_project
 from services.build_service import build_project
 from services.run_service import run_project
 from services.history_service import save_history
+from services.docker_detector import is_docker_project
 import os
 
 deploy_bp = Blueprint("deploy", __name__)
@@ -41,12 +42,14 @@ def deploy():
 
     # STEP 3 - Build
     build_path = detect_result["project_path"]
+    docker_result = is_docker_project(build_path)
     build_result = build_project(build_path, project_type)
     
     if not build_result["success"]:
         return jsonify({
         "success": False,
         "repository_path": project_path,
+        "docker": docker_result,
         "project_type": project_type,
         "build": build_result
         }), 500
@@ -57,9 +60,7 @@ def deploy():
     run_result = run_project(build_path, project_type)
 
     project_name = os.path.basename(project_path)
-    
-    raise Exception("Reached here")
-    
+        
     print("About to save history...")
 
     save_history(
