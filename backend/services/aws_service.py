@@ -1,21 +1,11 @@
-import os
 import boto3
+import os
+import time
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
-ec2 = boto3.client(
-    "ec2",
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_REGION")
-)
-
-import os
-import boto3
-from dotenv import load_dotenv
-
-load_dotenv()
+print("===== NEW AWS SERVICE LOADED =====")
 
 ec2 = boto3.client(
     "ec2",
@@ -27,6 +17,8 @@ ec2 = boto3.client(
 
 def launch_instance():
 
+    print("===== RUN_INSTANCES CALLED =====")
+    # 1. Create a NEW EC2 instance every deployment
     response = ec2.run_instances(
         ImageId=os.getenv("AMI_ID"),
         InstanceType="t3.micro",
@@ -34,16 +26,30 @@ def launch_instance():
         SecurityGroupIds=[os.getenv("SECURITY_GROUP_ID")],
         SubnetId=os.getenv("SUBNET_ID"),
         MinCount=1,
-        MaxCount=1
+        MaxCount=1,
+        TagSpecifications=[
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "DeployHub-Instance"
+                    }
+                ]
+            }
+        ]
     )
+    print(response)
 
     instance_id = response["Instances"][0]["InstanceId"]
 
-    # Wait until instance is running
+    print("Created:", instance_id)
+
+    # 2. Wait until EC2 is running
     waiter = ec2.get_waiter("instance_running")
     waiter.wait(InstanceIds=[instance_id])
 
-    # Get instance details
+    # 3. Reload instance details
     response = ec2.describe_instances(
         InstanceIds=[instance_id]
     )
@@ -52,8 +58,6 @@ def launch_instance():
 
     return {
         "success": True,
-        "instance_id": instance_id,
-        "public_ip": instance.get("PublicIpAddress"),
-        "private_ip": instance.get("PrivateIpAddress"),
-        "state": instance["State"]["Name"]
+        "instance_id": instance["InstanceId"],
+        "public_ip": instance["PublicIpAddress"]
     }
